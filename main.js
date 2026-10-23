@@ -6,6 +6,7 @@ const BRANDS = [
   { name: "Leonor", group: "lugares", year: 2008, href: `${SITE}/leonor/` },
   { name: "Cibeles", group: "lugares", year: null },
   { name: "Mezcal Unión", group: "spirits", year: 2011, href: `${SITE}/union/` },
+  { name: "Primo Aperitivo", group: "spirits", year: null },
   { name: "La Ventanita", group: "lugares", year: 2012, href: `${SITE}/ventanita/` },
   { name: "Salón ACME", group: "plataformas", year: 2013, href: `${SITE}/salon-acme/` },
   { name: "Trópico", group: "plataformas", year: 2013, href: `${SITE}/tropico/` },
@@ -54,6 +55,7 @@ const I18N = {
       "Para nosotros tampoco se trata de nuestros proyectos, sino de la comunidad que los vive. Es la excusa perfecta para comer rico, tomar mezcales y bailar sin fin, simplemente por estar conectados.",
     "timeline.title": "Línea del tiempo",
     "hero.count": "Proyectos",
+    loader: "Cargando",
     "footer.follow": "Síguenos",
     "footer.contact": "Escríbenos",
     "nav.home": "Archipiélago, inicio",
@@ -82,6 +84,7 @@ const I18N = {
       "For us, it isn't about our projects either, but about the community that lives them. It's the perfect excuse to eat well, drink mezcal and dance endlessly, simply by being connected.",
     "timeline.title": "Timeline",
     "hero.count": "Projects",
+    loader: "Loading",
     "footer.follow": "Follow us",
     "footer.contact": "Get in touch",
     "nav.home": "Archipiélago, home",
@@ -223,7 +226,9 @@ const state = {
   fontSize: 10,
   pointer: { x: -9999, y: -9999, active: false },
   hoverBrand: -1,
-  start: 0,
+  // Las letras no aparecen hasta que el loader las libera.
+  start: Infinity,
+  logoRect: null,
   visible: true,
   raf: 0,
 };
@@ -302,6 +307,11 @@ function letterStream() {
   return seq;
 }
 
+// Caja disponible para el logo dentro del hero.
+function logoBox(w, h) {
+  return [w * (w < 720 ? 0.96 : 0.74), h - (w < 720 ? 220 : 200)];
+}
+
 function layout() {
   const rect = canvas.getBoundingClientRect();
   state.dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -310,8 +320,7 @@ function layout() {
   canvas.width = Math.round(rect.width * state.dpr);
   canvas.height = Math.round(rect.height * state.dpr);
 
-  const boxW = state.w * (state.w < 720 ? 0.96 : 0.74);
-  const boxH = state.h - (state.w < 720 ? 220 : 200);
+  const [boxW, boxH] = logoBox(state.w, state.h);
   state.bounds ||= logoBounds();
   const { points, width, height, gap } = sampleLogo(boxW, boxH, state.bounds);
   state.gap = gap;
@@ -321,29 +330,31 @@ function layout() {
   const stream = letterStream();
   const prev = state.particles;
   const firstBuild = prev.length === 0;
+  state.logoRect = { x: ox + 1, y: oy + 1, w: width - 2, h: height - 2 };
+  positionLoaderLogo();
 
   state.particles = points.map(([x, y], i) => {
     const [ch, brand] = stream[i % stream.length];
     const tx = ox + x;
     const ty = oy + y;
     const old = prev[i];
-    const angle = Math.random() * Math.PI * 2;
-    const radius = Math.max(state.w, state.h) * (0.55 + Math.random() * 0.5);
+    // Al salir del loader, cada isla se desmorona en letras desde su propia forma.
+    const jitter = firstBuild && !reducedMotion ? gap * 4 : 0;
     return {
       ch,
       brand,
       tx,
       ty,
-      x: old ? old.x : firstBuild && !reducedMotion ? state.w / 2 + Math.cos(angle) * radius : tx,
-      y: old ? old.y : firstBuild && !reducedMotion ? state.h / 2 + Math.sin(angle) * radius : ty,
+      x: old ? old.x : tx + (Math.random() - 0.5) * jitter,
+      y: old ? old.y : ty + (Math.random() - 0.5) * jitter,
       vx: 0,
       vy: 0,
-      rot: firstBuild && !reducedMotion ? (Math.random() - 0.5) * 6 : 0,
+      rot: firstBuild && !reducedMotion ? (Math.random() - 0.5) * 2 : 0,
       vr: 0,
       scale: 1,
       alpha: firstBuild && !reducedMotion ? 0 : 1,
       // Se van formando de izquierda a derecha, como una ola.
-      delay: firstBuild ? (x / width) * 1100 + Math.random() * 500 : 0,
+      delay: firstBuild ? (x / width) * 700 + Math.random() * 400 : 0,
       phase: x * 0.018 + y * 0.011,
     };
   });
@@ -487,8 +498,166 @@ window.addEventListener("resize", () => {
   }, 150);
 });
 
-document.fonts.load(`800 20px ${FONT_FAMILY}`).finally(() => {
+/* ---------- Loader: el logo como islas en el mar ---------- */
+
+const loader = document.querySelector(".loader");
+const seaCanvas = loader.querySelector(".loader__sea");
+const sea = seaCanvas.getContext("2d");
+const loaderLogo = loader.querySelector(".loader__logo");
+const loaderCount = loader.querySelector(".loader__count");
+const SEA = "#1e3a2b";
+const LOADER_MIN = reducedMotion ? 300 : 2200;
+const DRAIN = reducedMotion ? 1 : 1200;
+const seaState = { level: 0, landAlpha: 1, start: performance.now(), done: false };
+const LAND = LOGO_PATHS.map((p) => ({ path: new Path2D(p.d), rule: p.evenodd ? "evenodd" : "nonzero" }));
+
+{
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const group = (className, onlyIslands) => {
+    const g = document.createElementNS(SVG_NS, "g");
+    g.setAttribute("class", className);
+    for (const p of LOGO_PATHS) {
+      if (onlyIslands && !p.evenodd) continue;
+      const path = document.createElementNS(SVG_NS, "path");
+      path.setAttribute("d", p.d);
+      if (p.evenodd) path.setAttribute("fill-rule", "evenodd");
+      g.append(path);
+    }
+    return g;
+  };
+  // Dos ondas desfasadas rompen contra la orilla de las islas.
+  loaderLogo.append(group("loader__ripple", true), group("loader__ripple loader__ripple--late", true));
+}
+
+function positionLoaderLogo() {
+  const { bounds: b, logoRect: r } = state;
+  if (!loader.isConnected || !r) return;
+  loaderLogo.setAttribute("viewBox", `${b.x} ${b.y} ${b.w} ${b.h}`);
+  Object.assign(loaderLogo.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
+}
+
+function fillLand(color) {
+  const { bounds: b, logoRect: r } = state;
+  if (!r) return;
+  const k = r.w / b.w;
+  sea.save();
+  // La tierra pertenece al hero, así que se desplaza con la página.
+  sea.translate(r.x, r.y - window.scrollY);
+  sea.scale(k, k);
+  sea.translate(-b.x, -b.y);
+  sea.fillStyle = color;
+  for (const { path, rule } of LAND) sea.fill(path, rule);
+  sea.restore();
+}
+
+function drawSea(now) {
+  if (seaState.done) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (seaCanvas.width !== Math.round(w * dpr) || seaCanvas.height !== Math.round(h * dpr)) {
+    seaCanvas.width = Math.round(w * dpr);
+    seaCanvas.height = Math.round(h * dpr);
+  }
+  const t = reducedMotion ? 0 : now - seaState.start;
+  sea.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sea.clearRect(0, 0, w, h);
+
+  // Superficie del agua: arriba de la pantalla al inicio, baja hasta vaciarse al salir.
+  const surface = seaState.level * (h + 80) - 40;
+  sea.beginPath();
+  sea.moveTo(0, h);
+  for (let x = 0; x <= w + 24; x += 24) {
+    sea.lineTo(x, surface + Math.sin(x * 0.007 + t * 0.003) * 16 + Math.sin(x * 0.019 - t * 0.002) * 6);
+  }
+  sea.lineTo(w, h);
+  sea.closePath();
+  sea.fillStyle = SEA;
+  sea.fill();
+
+  // Fuera del agua la tierra es verde sobre blanco; dentro del agua, blanca sobre el mar.
+  sea.globalAlpha = seaState.landAlpha;
+  fillLand(SEA);
+  sea.globalAlpha = 1;
+
+  sea.save();
+  sea.clip();
+  sea.strokeStyle = "rgba(255, 255, 255, 0.09)";
+  sea.lineWidth = 1;
+  for (let y0 = 6; y0 < h + 16; y0 += 15) {
+    sea.beginPath();
+    for (let x = 0; x <= w + 12; x += 12) {
+      const y = y0 + Math.sin(x * 0.011 + t * 0.0016 + y0 * 0.07) * 3.5 + Math.sin(x * 0.027 - t * 0.0023 + y0) * 1.2;
+      if (x === 0) sea.moveTo(x, y);
+      else sea.lineTo(x, y);
+    }
+    sea.stroke();
+  }
+  sea.globalAlpha = seaState.landAlpha;
+  fillLand("#fff");
+  sea.restore();
+  requestAnimationFrame(drawSea);
+}
+
+function tickCount(now) {
+  const p = Math.min(1, (now - seaState.start) / LOADER_MIN);
+  loaderCount.textContent = `[ ${String(Math.round((1 - (1 - p) ** 2) * 100)).padStart(3, "0")} ]`;
+  if (p < 1 && !seaState.done) requestAnimationFrame(tickCount);
+}
+
+function leaveLoader() {
+  loader.classList.add("is-leaving");
+  const t0 = performance.now();
+  const drain = (now) => {
+    const p = Math.min(1, (now - t0) / DRAIN);
+    seaState.level = p < 0.5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2;
+    if (p < 1) requestAnimationFrame(drain);
+  };
+  requestAnimationFrame(drain);
+
+  // Cuando el agua ya bajó de las islas, se desmoronan en letras.
+  setTimeout(() => {
+    state.start = performance.now();
+    requestFrame();
+    const f0 = performance.now();
+    const fade = (now) => {
+      seaState.landAlpha = Math.max(0, 1 - (now - f0) / 700);
+      if (seaState.landAlpha > 0) requestAnimationFrame(fade);
+    };
+    requestAnimationFrame(fade);
+  }, DRAIN * 0.8);
+
+  setTimeout(() => {
+    seaState.done = true;
+    loader.remove();
+    document.documentElement.style.overflow = "";
+    document.body.classList.add("is-loaded");
+  }, DRAIN + 900);
+}
+
+state.bounds = logoBounds();
+{
+  // Coloca las islas del loader exactamente donde se formarán las letras.
+  const rect = canvas.getBoundingClientRect();
+  const [boxW, boxH] = logoBox(rect.width, rect.height);
+  const scale = Math.min(boxW / state.bounds.w, boxH / state.bounds.h);
+  const width = Math.ceil(state.bounds.w * scale) + 2;
+  const height = Math.ceil(state.bounds.h * scale) + 2;
+  state.logoRect = { x: (rect.width - width) / 2 + 1, y: (rect.height - height) / 2 + 11, w: width - 2, h: height - 2 };
+  positionLoaderLogo();
+}
+
+history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+document.documentElement.style.overflow = "hidden";
+requestAnimationFrame(drawSea);
+requestAnimationFrame(tickCount);
+
+Promise.all([
+  document.fonts.load(`800 20px ${FONT_FAMILY}`).catch(() => {}),
+  new Promise((resolve) => setTimeout(resolve, LOADER_MIN)),
+]).then(() => {
   layout();
-  state.start = performance.now();
   requestFrame();
+  requestAnimationFrame(leaveLoader);
 });

@@ -148,6 +148,79 @@ a {
   color: var(--forest);
 }
 
+/* ---------- Loader: islas en el mar ---------- */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  /* Si el JS falla, el loader se quita solo. */
+  animation: loader-failsafe 0s linear 10s forwards;
+}
+
+.loader__sea {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.loader__logo {
+  position: absolute;
+  overflow: visible;
+}
+
+.loader__ripple path {
+  fill: none;
+  stroke: #fff;
+  vector-effect: non-scaling-stroke;
+  animation: ripple 3s ease-out infinite;
+}
+
+.loader__ripple--late path {
+  animation-delay: 1.5s;
+}
+
+.loader.is-leaving .loader__ripple {
+  display: none;
+}
+
+.loader__bar {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--pad) 22px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+  transition: opacity 0.4s ease;
+}
+
+.loader.is-leaving .loader__bar {
+  opacity: 0;
+}
+
+@keyframes ripple {
+  from {
+    stroke-width: 0;
+    stroke-opacity: 0.4;
+  }
+  to {
+    stroke-width: 34px;
+    stroke-opacity: 0;
+  }
+}
+
+@keyframes loader-failsafe {
+  to {
+    visibility: hidden;
+  }
+}
+
 /* ---------- Hero ---------- */
 
 .hero {
@@ -176,7 +249,10 @@ a {
   padding: 0 var(--pad) 22px;
   pointer-events: none;
   opacity: 0;
-  animation: fade-in 1s ease 2.6s forwards;
+}
+
+.is-loaded .hero__bar {
+  animation: fade-in 1s ease 0.6s forwards;
 }
 
 .hero__bar p {
@@ -565,9 +641,14 @@ a {
     scroll-behavior: auto;
   }
 
-  .hero__bar {
+  .hero__bar,
+  .is-loaded .hero__bar {
     animation: none;
     opacity: 1;
+  }
+
+  .loader__ripple path {
+    animation: none;
   }
 
   .hero__dot {
