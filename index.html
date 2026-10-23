@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Archipiélago</title>
+  <meta name="description" content="Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias." />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <a class="nav__brand" href="#top" aria-label="Archipiélago, inicio">ARCHIPIÉLAGO</a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="#lugares" data-i18n="nav.lugares">Lugares</a>
+      <a href="#plataformas" data-i18n="nav.plataformas">Plataformas</a>
+      <a href="#spirits" data-i18n="nav.spirits">Spirits</a>
+      <a href="#manifesto" data-i18n="nav.manifesto">Manifesto</a>
+      <a href="#contacto" data-i18n="nav.contacto">Contacto</a>
+    </nav>
+    <div class="nav__lang" role="group" aria-label="Idioma">
+      <button type="button" data-lang="es" aria-pressed="true">Esp</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang="en" aria-pressed="false">Eng</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="Archipiélago">
+      <canvas class="hero__canvas" aria-hidden="true"></canvas>
+      <h1 class="visually-hidden">Archipiélago</h1>
+      <div class="hero__tag" aria-hidden="true"></div>
+      <p class="hero__hint" data-i18n="hero.hint">Pasa el cursor sobre las islas</p>
+    </section>
+
+    <section class="intro">
+      <p class="intro__lead" data-i18n="intro.lead">Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias, aportando cambios culturales a la manera en que disfrutamos la vida.</p>
+      <p class="intro__body" data-i18n="intro.body">Hacemos lugares, restaurantes, bares, clubs, plataformas, festivales, ferias, fiestas, spirits artesanales mexicanos y más cosas que queramos compartir y disfrutar en comunidad.</p>
+    </section>
+
+    <section class="directory" aria-label="Proyectos">
+      <div class="directory__group" id="lugares">
+        <h2 class="directory__title" data-i18n="nav.lugares">Lugares</h2>
+        <ul class="directory__list" data-group="lugares"></ul>
+      </div>
+      <div class="directory__group" id="plataformas">
+        <h2 class="directory__title" data-i18n="nav.plataformas">Plataformas</h2>
+        <ul class="directory__list" data-group="plataformas"></ul>
+      </div>
+      <div class="directory__group" id="spirits">
+        <h2 class="directory__title" data-i18n="nav.spirits">Spirits</h2>
+        <ul class="directory__list" data-group="spirits"></ul>
+      </div>
+    </section>
+
+    <section class="manifesto" id="manifesto">
+      <h2 class="section-label" data-i18n="nav.manifesto">Manifesto</h2>
+      <blockquote class="manifesto__quote">
+        <p data-i18n="manifesto.quote">Para los griegos, un archipiélago no se trata de sus islas sino del mar que las rodea. Para nosotros tampoco se trata de nuestros proyectos, sino de la comunidad que los vive.</p>
+      </blockquote>
+      <p class="manifesto__body" data-i18n="manifesto.body">Es la excusa perfecta para comer rico, tomar mezcales y bailar sin fin en una fiesta que bien podría salvar al mundo, al menos por un instante, simplemente por estar conectados.</p>
+    </section>
+
+    <section class="timeline" aria-labelledby="timeline-title">
+      <h2 class="section-label" id="timeline-title" data-i18n="timeline.title">Línea del tiempo</h2>
+      <ol class="timeline__list"></ol>
+    </section>
+  </main>
+
+  <footer class="footer" id="contacto">
+    <img class="footer__logo" src="assets/logo.svg" alt="Archipiélago" width="226" height="154" />
+    <div class="footer__links">
+      <a href="https://instagram.com/archipielagomx" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.facebook.com/Archipielagomx/" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://archipielagomx.com/contacto/" target="_blank" rel="noopener" data-i18n="nav.contacto">Contacto</a>
+    </div>
+    <p class="footer__copy">©Archipiélago <span class="js-year">2026</span></p>
+  </footer>
+
+  <div class="cursor-label" aria-hidden="true"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
