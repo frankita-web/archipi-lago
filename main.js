@@ -4,12 +4,11 @@ const SITE = "https://archipielagomx.com";
 
 const BRANDS = [
   { name: "Leonor", group: "lugares", year: 2008, href: `${SITE}/leonor/` },
+  { name: "Cibeles", group: "lugares", year: null },
   { name: "Mezcal Unión", group: "spirits", year: 2011, href: `${SITE}/union/` },
-  { name: "Cancino", group: "lugares", year: 2011, href: `${SITE}/cancino/` },
   { name: "La Ventanita", group: "lugares", year: 2012, href: `${SITE}/ventanita/` },
   { name: "Salón ACME", group: "plataformas", year: 2013, href: `${SITE}/salon-acme/` },
   { name: "Trópico", group: "plataformas", year: 2013, href: `${SITE}/tropico/` },
-  { name: "La Zaranda", group: "lugares", year: 2015, href: `${SITE}/la-zaranda/` },
   { name: "Café Paraíso", group: "lugares", year: 2015, href: `${SITE}/cafe-paraiso/` },
   { name: "Bonbón", group: "lugares", year: 2017, href: `${SITE}/bonbon/` },
   { name: "RadioBosque", group: "plataformas", year: 2019, href: `${SITE}/radiobosque/` },
@@ -23,30 +22,17 @@ const BRANDS = [
 const TIMELINE = [
   ["2008-07", "Leonor"],
   ["2011-03", "Mezcal Unión"],
-  ["2011-06", "Cancino Cibeles"],
   ["2012-01", "La Ventanita"],
-  ["2012-10", "Cancino Havre"],
   ["2013-04", "Salón ACME"],
   ["2013-12", "Trópico"],
-  ["2014-01", "Cancino San Miguel"],
-  ["2015-05", "La Zaranda"],
-  ["2015-05", "Cancino Alameda"],
-  ["2015-07", "Cancino Cabrera"],
   ["2015-11", "Café Paraíso"],
   ["2016-01", "Taller"],
   ["2017-02", "Bonbón"],
-  ["2018-12", "Cancino Polanquito"],
-  ["2019-09", "Cancino Pedregal"],
   ["2019-11", "RadioBosque"],
-  ["2020-05", "Cancino Nápoles"],
   ["2020-10", "Jardín Paraíso"],
   ["2021-05", "Taverna"],
-  ["2021-12", "Cancino Prado"],
-  ["2022-09", "Cancino Coyoacán"],
   ["2023-02", "Primo"],
   ["2023-09", "Ayer"],
-  ["2023-11", "Cancino San Ángel"],
-  [null, "Cancino Mixcoac"],
 ];
 
 const I18N = {
@@ -58,14 +44,23 @@ const I18N = {
     "nav.contacto": "Contacto",
     "hero.hint": matchMedia("(hover: hover)").matches ? "Pasa el cursor sobre las islas" : "Toca las islas",
     "intro.lead":
-      "Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias, aportando cambios culturales a la manera en que disfrutamos la vida.",
+      "Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias.",
     "intro.body":
       "Hacemos lugares, restaurantes, bares, clubs, plataformas, festivales, ferias, fiestas, spirits artesanales mexicanos y más cosas que queramos compartir y disfrutar en comunidad.",
     "manifesto.quote":
-      "Para los griegos, un archipiélago no se trata de sus islas sino del mar que las rodea. Para nosotros tampoco se trata de nuestros proyectos, sino de la comunidad que los vive.",
+      "Para los griegos, un archipiélago no se trata de sus islas sino del mar que las rodea.",
     "manifesto.body":
-      "Es la excusa perfecta para comer rico, tomar mezcales y bailar sin fin en una fiesta que bien podría salvar al mundo, al menos por un instante, simplemente por estar conectados.",
+      "Para nosotros tampoco se trata de nuestros proyectos, sino de la comunidad que los vive. Es la excusa perfecta para comer rico, tomar mezcales y bailar sin fin, simplemente por estar conectados.",
     "timeline.title": "Línea del tiempo",
+    "hero.count": "Proyectos",
+    "footer.follow": "Síguenos",
+    "footer.contact": "Escríbenos",
+    "nav.home": "Archipiélago, inicio",
+    "nav.label": "Principal",
+    "lang.label": "Idioma",
+    "directory.label": "Proyectos",
+    title: "Archipiélago",
+    description: "Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias.",
     soon: "Próximamente",
     months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
   },
@@ -77,14 +72,23 @@ const I18N = {
     "nav.contacto": "Contact",
     "hero.hint": matchMedia("(hover: hover)").matches ? "Move your cursor over the islands" : "Touch the islands",
     "intro.lead":
-      "An ecosystem where we create and incubate brands around hospitality and experiences, bringing cultural change to the way we enjoy life.",
+      "An ecosystem where we create and incubate brands around hospitality and experiences.",
     "intro.body":
       "We make places, restaurants, bars, clubs, platforms, festivals, fairs, parties, Mexican craft spirits and anything else we want to share and enjoy as a community.",
     "manifesto.quote":
-      "For the Greeks, an archipelago is not about its islands but about the sea that surrounds them. For us, it isn't about our projects either, but about the community that lives them.",
+      "For the Greeks, an archipelago is not about its islands but about the sea that surrounds them.",
     "manifesto.body":
-      "It's the perfect excuse to eat well, drink mezcal and dance endlessly at a party that could very well save the world, at least for an instant, simply by being connected.",
+      "For us, it isn't about our projects either, but about the community that lives them. It's the perfect excuse to eat well, drink mezcal and dance endlessly, simply by being connected.",
     "timeline.title": "Timeline",
+    "hero.count": "Projects",
+    "footer.follow": "Follow us",
+    "footer.contact": "Get in touch",
+    "nav.home": "Archipiélago, home",
+    "nav.label": "Main",
+    "lang.label": "Language",
+    "directory.label": "Projects",
+    title: "Archipiélago",
+    description: "An ecosystem where we create and incubate brands around hospitality and experiences.",
     soon: "Coming soon",
     months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   },
@@ -102,26 +106,26 @@ function renderDirectory() {
     list.innerHTML = "";
     for (const brand of BRANDS.filter((b) => b.group === list.dataset.group)) {
       const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = brand.href;
-      a.target = "_blank";
-      a.rel = "noopener";
-      const name = document.createElement("span");
-      name.className = "name";
-      name.textContent = brand.name;
-      a.append(name);
-      if (brand.year) {
-        const year = document.createElement("span");
-        year.className = "year";
-        year.textContent = brand.year;
-        a.append(year);
+      const row = document.createElement(brand.href ? "a" : "div");
+      row.className = "row";
+      if (brand.href) {
+        row.href = brand.href;
+        row.target = "_blank";
+        row.rel = "noopener";
       }
-      a.addEventListener("mouseenter", () => scramble(name, brand.name));
-      a.addEventListener("focus", () => scramble(name, brand.name));
-      li.append(a);
+      const name = document.createElement("span");
+      name.textContent = brand.name;
+      const meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = brand.year ? `[${brand.year}]` : "[—]";
+      row.append(name, meta);
+      row.addEventListener("mouseenter", () => scramble(name, brand.name));
+      row.addEventListener("focus", () => scramble(name, brand.name));
+      li.append(row);
       list.append(li);
     }
   }
+  document.querySelector(".js-count").textContent = `[${BRANDS.length}]`;
 }
 
 function renderTimeline() {
@@ -158,10 +162,15 @@ function scramble(el, text) {
 
 function setLang(next) {
   lang = next;
+  const t = I18N[next];
   document.documentElement.lang = next;
+  document.title = t.title;
+  document.querySelector('meta[name="description"]').content = t.description;
   for (const el of document.querySelectorAll("[data-i18n]")) {
-    const value = I18N[next][el.dataset.i18n];
-    if (value) el.textContent = value;
+    if (t[el.dataset.i18n]) el.textContent = t[el.dataset.i18n];
+  }
+  for (const el of document.querySelectorAll("[data-i18n-aria]")) {
+    if (t[el.dataset.i18nAria]) el.setAttribute("aria-label", t[el.dataset.i18nAria]);
   }
   for (const btn of document.querySelectorAll("[data-lang]")) {
     btn.setAttribute("aria-pressed", String(btn.dataset.lang === next));
@@ -169,17 +178,38 @@ function setLang(next) {
   renderTimeline();
 }
 
-document.querySelectorAll("[data-lang]").forEach((btn) => btn.addEventListener("click", () => setLang(btn.dataset.lang)));
-document.querySelector(".js-year").textContent = new Date().getFullYear();
+// Prioridad: ?lang=en en la URL, luego la última elección, luego el idioma del navegador.
+function initialLang() {
+  const fromUrl = new URLSearchParams(location.search).get("lang");
+  if (fromUrl in I18N) return fromUrl;
+  try {
+    const saved = localStorage.getItem("lang");
+    if (saved in I18N) return saved;
+  } catch {}
+  return navigator.language?.toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+document.querySelectorAll("[data-lang]").forEach((btn) =>
+  btn.addEventListener("click", () => {
+    setLang(btn.dataset.lang);
+    try {
+      localStorage.setItem("lang", btn.dataset.lang);
+    } catch {}
+    const url = new URL(location.href);
+    url.searchParams.set("lang", btn.dataset.lang);
+    history.replaceState(null, "", url);
+  })
+);
+document.querySelectorAll(".js-year").forEach((el) => (el.textContent = new Date().getFullYear()));
 renderDirectory();
-setLang("es");
+setLang(initialLang());
 
 /* ---------- Hero: logo hecho de letras ---------- */
 
 const canvas = document.querySelector(".hero__canvas");
 const ctx = canvas.getContext("2d");
 const label = document.querySelector(".cursor-label");
-const FONT_FAMILY = '"Barlow Condensed", "Arial Narrow", sans-serif';
+const FONT_FAMILY = '"JetBrains Mono", ui-monospace, monospace';
 const FOREST = "#1e3a2b";
 
 const state = {
