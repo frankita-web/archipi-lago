@@ -14,8 +14,9 @@ const BRANDS = [
   { name: "RadioBosque", group: "plataformas", year: 2019, href: `${SITE}/radiobosque/` },
   { name: "Jardín Paraíso", group: "lugares", year: 2020, href: `${SITE}/jardin-paraiso/` },
   { name: "Taverna", group: "lugares", year: 2021, href: `${SITE}/taverna/` },
-  { name: "Primo", group: null, year: 2023 },
-  { name: "Ayer", group: null, year: 2023 },
+  { name: "Primo", group: "lugares", year: 2023 },
+  { name: "Ayer", group: "lugares", year: 2023 },
+  { name: "Abrazarnos", group: "plataformas", year: null },
   { name: "Liga Productora", group: "plataformas", year: null, href: `${SITE}/liga-productora/` },
 ];
 
