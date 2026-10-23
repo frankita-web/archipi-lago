@@ -1,25 +1,26 @@
 import { LOGO_PATHS, LOGO_VIEWBOX } from "./logo-paths.js";
-
-const SITE = "https://archipielagomx.com";
+import { BRAND_PAGES } from "./data/brand-pages.js";
+import { bindLangButtons } from "./lang.js";
+import { I18N } from "./i18n.js";
 
 const BRANDS = [
-  { name: "Leonor", group: "lugares", year: 2008, href: `${SITE}/leonor/` },
+  { name: "Leonor", group: "lugares", year: 2008, slug: "leonor" },
   { name: "Cibeles", group: "lugares", year: null },
-  { name: "Mezcal Unión", group: "spirits", year: 2011, href: `${SITE}/union/` },
+  { name: "Mezcal Unión", group: "spirits", year: 2011, slug: "union" },
   { name: "Primo Aperitivo", group: "spirits", year: null },
-  { name: "La Ventanita", group: "lugares", year: 2012, href: `${SITE}/ventanita/` },
-  { name: "Salón ACME", group: "plataformas", year: 2013, href: `${SITE}/salon-acme/` },
-  { name: "Trópico", group: "plataformas", year: 2013, href: `${SITE}/tropico/` },
-  { name: "Café Paraíso", group: "lugares", year: 2015, href: `${SITE}/cafe-paraiso/` },
-  { name: "Bonbón", group: "lugares", year: 2017, href: `${SITE}/bonbon/` },
-  { name: "RadioBosque", group: "plataformas", year: 2019, href: `${SITE}/radiobosque/` },
-  { name: "Jardín Paraíso", group: "lugares", year: 2020, href: `${SITE}/jardin-paraiso/` },
-  { name: "Taverna", group: "lugares", year: 2021, href: `${SITE}/taverna/` },
+  { name: "La Ventanita", group: "lugares", year: 2012, slug: "ventanita" },
+  { name: "Salón ACME", group: "plataformas", year: 2013, slug: "salon-acme" },
+  { name: "Trópico", group: "plataformas", year: 2013, slug: "tropico" },
+  { name: "Café Paraíso", group: "lugares", year: 2015, slug: "cafe-paraiso" },
+  { name: "Bonbón", group: "lugares", year: 2017, slug: "bonbon" },
+  { name: "RadioBosque", group: "plataformas", year: 2019, slug: "radiobosque" },
+  { name: "Jardín Paraíso", group: "lugares", year: 2020, slug: "jardin-paraiso" },
+  { name: "Taverna", group: "lugares", year: 2021, slug: "taverna" },
   { name: "Primo", group: "lugares", year: 2023 },
   { name: "Ayer", group: "lugares", year: 2023 },
   { name: "Abrazarnos", group: "plataformas", year: null },
-  { name: "Liga Productora", group: "plataformas", year: null, href: `${SITE}/liga-productora/` },
-];
+  { name: "Liga Productora", group: "plataformas", year: null, slug: "liga-productora" },
+].map((b) => ({ ...b, href: BRAND_PAGES[b.slug] ? `/${b.slug}/` : null }));
 
 const TIMELINE = [
   ["2008-07", "Leonor"],
@@ -37,67 +38,6 @@ const TIMELINE = [
   ["2023-09", "Ayer"],
 ];
 
-const I18N = {
-  es: {
-    "nav.lugares": "Lugares",
-    "nav.plataformas": "Plataformas",
-    "nav.spirits": "Spirits",
-    "nav.manifesto": "Manifesto",
-    "nav.contacto": "Contacto",
-    "hero.hint": matchMedia("(hover: hover)").matches ? "Pasa el cursor sobre las islas" : "Toca las islas",
-    "intro.lead":
-      "Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias.",
-    "intro.body":
-      "Hacemos lugares, restaurantes, bares, clubs, plataformas, festivales, ferias, fiestas, spirits artesanales mexicanos y más cosas que queramos compartir y disfrutar en comunidad.",
-    "manifesto.quote":
-      "Para los griegos, un archipiélago no se trata de sus islas sino del mar que las rodea.",
-    "manifesto.body":
-      "Para nosotros tampoco se trata de nuestros proyectos, sino de la comunidad que los vive. Es la excusa perfecta para comer rico, tomar mezcales y bailar sin fin, simplemente por estar conectados.",
-    "timeline.title": "Línea del tiempo",
-    "hero.count": "Proyectos",
-    loader: "Cargando",
-    "footer.follow": "Síguenos",
-    "footer.contact": "Escríbenos",
-    "nav.home": "Archipiélago, inicio",
-    "nav.label": "Principal",
-    "lang.label": "Idioma",
-    "directory.label": "Proyectos",
-    title: "Archipiélago",
-    description: "Ecosistema donde creamos e incubamos marcas alrededor de la hospitalidad y las experiencias.",
-    soon: "Próximamente",
-    months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-  },
-  en: {
-    "nav.lugares": "Places",
-    "nav.plataformas": "Platforms",
-    "nav.spirits": "Spirits",
-    "nav.manifesto": "Manifesto",
-    "nav.contacto": "Contact",
-    "hero.hint": matchMedia("(hover: hover)").matches ? "Move your cursor over the islands" : "Touch the islands",
-    "intro.lead":
-      "An ecosystem where we create and incubate brands around hospitality and experiences.",
-    "intro.body":
-      "We make places, restaurants, bars, clubs, platforms, festivals, fairs, parties, Mexican craft spirits and anything else we want to share and enjoy as a community.",
-    "manifesto.quote":
-      "For the Greeks, an archipelago is not about its islands but about the sea that surrounds them.",
-    "manifesto.body":
-      "For us, it isn't about our projects either, but about the community that lives them. It's the perfect excuse to eat well, drink mezcal and dance endlessly, simply by being connected.",
-    "timeline.title": "Timeline",
-    "hero.count": "Projects",
-    loader: "Loading",
-    "footer.follow": "Follow us",
-    "footer.contact": "Get in touch",
-    "nav.home": "Archipiélago, home",
-    "nav.label": "Main",
-    "lang.label": "Language",
-    "directory.label": "Projects",
-    title: "Archipiélago",
-    description: "An ecosystem where we create and incubate brands around hospitality and experiences.",
-    soon: "Coming soon",
-    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  },
-};
-
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const ALPHABET = [...new Set(BRANDS.map((b) => b.name.toUpperCase().replace(/\s/g, "")).join(""))];
 
@@ -112,11 +52,7 @@ function renderDirectory() {
       const li = document.createElement("li");
       const row = document.createElement(brand.href ? "a" : "div");
       row.className = "row";
-      if (brand.href) {
-        row.href = brand.href;
-        row.target = "_blank";
-        row.rel = "noopener";
-      }
+      if (brand.href) row.href = brand.href;
       const name = document.createElement("span");
       name.textContent = brand.name;
       const meta = document.createElement("span");
@@ -170,43 +106,20 @@ function setLang(next) {
   document.documentElement.lang = next;
   document.title = t.title;
   document.querySelector('meta[name="description"]').content = t.description;
+  const touch = !matchMedia("(hover: hover)").matches;
   for (const el of document.querySelectorAll("[data-i18n]")) {
-    if (t[el.dataset.i18n]) el.textContent = t[el.dataset.i18n];
+    const key = touch && t[`${el.dataset.i18n}.touch`] ? `${el.dataset.i18n}.touch` : el.dataset.i18n;
+    if (t[key]) el.textContent = t[key];
   }
   for (const el of document.querySelectorAll("[data-i18n-aria]")) {
     if (t[el.dataset.i18nAria]) el.setAttribute("aria-label", t[el.dataset.i18nAria]);
   }
-  for (const btn of document.querySelectorAll("[data-lang]")) {
-    btn.setAttribute("aria-pressed", String(btn.dataset.lang === next));
-  }
   renderTimeline();
 }
 
-// Prioridad: ?lang=en en la URL, luego la última elección, luego el idioma del navegador.
-function initialLang() {
-  const fromUrl = new URLSearchParams(location.search).get("lang");
-  if (fromUrl in I18N) return fromUrl;
-  try {
-    const saved = localStorage.getItem("lang");
-    if (saved in I18N) return saved;
-  } catch {}
-  return navigator.language?.toLowerCase().startsWith("es") ? "es" : "en";
-}
-
-document.querySelectorAll("[data-lang]").forEach((btn) =>
-  btn.addEventListener("click", () => {
-    setLang(btn.dataset.lang);
-    try {
-      localStorage.setItem("lang", btn.dataset.lang);
-    } catch {}
-    const url = new URL(location.href);
-    url.searchParams.set("lang", btn.dataset.lang);
-    history.replaceState(null, "", url);
-  })
-);
 document.querySelectorAll(".js-year").forEach((el) => (el.textContent = new Date().getFullYear()));
 renderDirectory();
-setLang(initialLang());
+bindLangButtons(setLang);
 
 /* ---------- Hero: logo hecho de letras ---------- */
 
@@ -478,7 +391,7 @@ canvas.addEventListener("pointercancel", clearPointer);
 window.addEventListener("scroll", () => state.pointer.active && clearPointer(), { passive: true });
 canvas.addEventListener("click", () => {
   const brand = BRANDS[state.hoverBrand];
-  if (brand?.href && matchMedia("(hover: hover)").matches) window.open(brand.href, "_blank", "noopener");
+  if (brand?.href && matchMedia("(hover: hover)").matches) location.href = brand.href;
 });
 
 new IntersectionObserver(([entry]) => {
