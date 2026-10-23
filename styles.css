@@ -332,22 +332,20 @@ a {
 
 .intro {
   padding: var(--section) var(--pad);
-  text-align: center;
 }
 
 .intro__lead {
-  max-width: 1180px;
-  margin: 0 auto 40px;
-  font-weight: 500;
-  font-size: clamp(34px, 5.2vw, 76px);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  max-width: 1280px;
+  margin: 0 0 40px;
+  font-weight: 700;
+  font-size: clamp(36px, 5.4vw, 84px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
 }
 
 .intro__body {
   max-width: 520px;
-  margin: 0 auto;
+  margin: 0;
   font-size: 17px;
   color: var(--forest-soft);
 }
@@ -397,11 +395,10 @@ a {
   gap: 12px;
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
-  font-weight: 500;
+  font-weight: 700;
   font-size: clamp(24px, 2.6vw, 40px);
   line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  letter-spacing: -0.035em;
   transition: padding 0.3s ease;
 }
 
@@ -422,7 +419,6 @@ a {
   padding: var(--section) var(--pad);
   background: var(--forest);
   color: #fff;
-  text-align: center;
   scroll-margin-top: 60px;
 }
 
@@ -432,22 +428,21 @@ a {
 }
 
 .manifesto__quote {
-  max-width: 1240px;
-  margin: 0 auto 48px;
+  max-width: 1280px;
+  margin: 0 0 48px;
 }
 
 .manifesto__quote p {
   margin: 0;
-  font-weight: 500;
-  font-size: clamp(36px, 5.6vw, 84px);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  font-weight: 700;
+  font-size: clamp(36px, 5.6vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
 }
 
 .manifesto__body {
   max-width: 540px;
-  margin: 0 auto;
+  margin: 0;
   font-size: 17px;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -502,11 +497,10 @@ a {
 }
 
 .timeline__name {
-  font-weight: 500;
+  font-weight: 700;
   font-size: 26px;
   line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  letter-spacing: -0.035em;
 }
 
 /* ---------- Footer ---------- */
@@ -536,11 +530,10 @@ a {
 }
 
 .social-card__name {
-  font-weight: 500;
+  font-weight: 700;
   font-size: clamp(40px, 6vw, 96px);
   line-height: 0.9;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  letter-spacing: -0.035em;
 }
 
 .social-card__handle {
