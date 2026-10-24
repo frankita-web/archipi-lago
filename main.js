@@ -139,9 +139,7 @@ const state = {
   fontSize: 10,
   pointer: { x: -9999, y: -9999, active: false },
   hoverBrand: -1,
-  // Las letras no aparecen hasta que el loader las libera.
-  start: Infinity,
-  logoRect: null,
+  start: 0,
   visible: true,
   raf: 0,
 };
@@ -243,31 +241,31 @@ function layout() {
   const stream = letterStream();
   const prev = state.particles;
   const firstBuild = prev.length === 0;
-  state.logoRect = { x: ox + 1, y: oy + 1, w: width - 2, h: height - 2 };
-  positionLoaderLogo();
 
   state.particles = points.map(([x, y], i) => {
     const [ch, brand] = stream[i % stream.length];
     const tx = ox + x;
     const ty = oy + y;
     const old = prev[i];
-    // Al salir del loader, cada isla se desmorona en letras desde su propia forma.
-    const jitter = firstBuild && !reducedMotion ? gap * 4 : 0;
+    // Al cargar, cada letra llega desde fuera de la pantalla.
+    const intro = firstBuild && !reducedMotion;
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.max(state.w, state.h) * (0.55 + Math.random() * 0.5);
     return {
       ch,
       brand,
       tx,
       ty,
-      x: old ? old.x : tx + (Math.random() - 0.5) * jitter,
-      y: old ? old.y : ty + (Math.random() - 0.5) * jitter,
+      x: old ? old.x : intro ? state.w / 2 + Math.cos(angle) * radius : tx,
+      y: old ? old.y : intro ? state.h / 2 + Math.sin(angle) * radius : ty,
       vx: 0,
       vy: 0,
-      rot: firstBuild && !reducedMotion ? (Math.random() - 0.5) * 2 : 0,
+      rot: intro ? (Math.random() - 0.5) * 6 : 0,
       vr: 0,
       scale: 1,
       alpha: firstBuild && !reducedMotion ? 0 : 1,
       // Se van formando de izquierda a derecha, como una ola.
-      delay: firstBuild ? (x / width) * 700 + Math.random() * 400 : 0,
+      delay: firstBuild ? (x / width) * 1100 + Math.random() * 500 : 0,
       phase: x * 0.018 + y * 0.011,
     };
   });
@@ -411,119 +409,14 @@ window.addEventListener("resize", () => {
   }, 150);
 });
 
-/* ---------- Loader: el logo como carta náutica ---------- */
-
-const loader = document.querySelector(".loader");
-const loaderLogo = loader.querySelector(".loader__logo");
-const loaderCount = loader.querySelector(".loader__count");
-const LOADER_MIN = reducedMotion ? 300 : 2600;
-const loaderStart = performance.now();
-let loaderDone = false;
-
-{
-  const SVG_NS = "http://www.w3.org/2000/svg";
-  const paths = (filter, attrs = {}) =>
-    LOGO_PATHS.filter(filter).map((p) => {
-      const el = document.createElementNS(SVG_NS, "path");
-      el.setAttribute("d", p.d);
-      if (p.evenodd) el.setAttribute("fill-rule", "evenodd");
-      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
-      return el;
-    });
-  const group = (className, children, i) => {
-    const g = document.createElementNS(SVG_NS, "g");
-    g.setAttribute("class", className);
-    if (i) g.style.setProperty("--i", i);
-    g.append(...children);
-    return g;
-  };
-  const islands = (p) => p.evenodd;
-  // Líneas de profundidad: cada una es un trazo grueso verde tapado por uno blanco un poco más angosto,
-  // así solo queda una línea fina a esa distancia de la costa. Se dibujan de la más lejana a la más cercana.
-  const contours = [4, 3, 2, 1].map((i) => group("contour", [group("ink", paths(islands)), group("erase", paths(islands))], i));
-  // El contorno se dibuja por subtrazo (cada isla y cada letra por separado) para que la línea sea continua.
-  const outline = LOGO_PATHS.flatMap((p) => p.d.split(/(?=M)/)).map((d) => {
-    const el = document.createElementNS(SVG_NS, "path");
-    el.setAttribute("d", d);
-    el.setAttribute("pathLength", "1");
-    return el;
-  });
-  loaderLogo.append(
-    group("loader__contours", contours),
-    group("loader__mask", paths(islands)),
-    group("loader__fill", paths(() => true)),
-    group("loader__outline", outline)
-  );
-}
-
-function positionLoaderLogo() {
-  const { bounds: b, logoRect: r } = state;
-  if (!loader.isConnected || !r) return;
-  loaderLogo.setAttribute("viewBox", `${b.x} ${b.y} ${b.w} ${b.h}`);
-  Object.assign(loaderLogo.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
-  // Línea de contorno de ~1.25px en pantalla, expresada en unidades del viewBox.
-  loaderLogo.querySelector(".loader__outline").style.strokeWidth = `${(1.25 * b.w) / r.w}`;
-  const unit = Math.max(5, r.w / 95);
-  for (const contour of loaderLogo.querySelectorAll(".contour")) {
-    const d = unit * Number(contour.style.getPropertyValue("--i"));
-    contour.querySelector(".ink").style.strokeWidth = `${2 * d + 1}px`;
-    contour.querySelector(".erase").style.strokeWidth = `${2 * d - 1}px`;
-  }
-}
-
-function tickCount(now) {
-  const p = Math.min(1, (now - loaderStart) / LOADER_MIN);
-  loaderCount.textContent = `[ ${String(Math.round((1 - (1 - p) ** 2) * 100)).padStart(3, "0")} ]`;
-  if (p < 1 && !loaderDone) requestAnimationFrame(tickCount);
-}
-
-// El contorno se rellena, las líneas de profundidad se van y el logo se deshace en letras.
-function leaveLoader() {
-  loader.classList.add("is-filling");
-  setTimeout(() => {
-    loader.classList.add("is-dissolving");
-    state.start = performance.now();
-    requestFrame();
-  }, reducedMotion ? 0 : 600);
-  setTimeout(() => {
-    loaderDone = true;
-    loader.remove();
-    document.documentElement.style.overflow = "";
-    goToStart();
-    document.body.classList.add("is-loaded");
-  }, reducedMotion ? 300 : 1500);
-}
-
-state.bounds = logoBounds();
-{
-  // Coloca las islas del loader exactamente donde se formarán las letras.
-  const rect = canvas.getBoundingClientRect();
-  const [boxW, boxH] = logoBox(rect.width, rect.height);
-  const scale = Math.min(boxW / state.bounds.w, boxH / state.bounds.h);
-  const width = Math.ceil(state.bounds.w * scale) + 2;
-  const height = Math.ceil(state.bounds.h * scale) + 2;
-  state.logoRect = { x: (rect.width - width) / 2 + 1, y: (rect.height - height) / 2 + 11, w: width - 2, h: height - 2 };
-  positionLoaderLogo();
-}
-
 // Al cargar, la página siempre arranca en el logo (o en la sección del #ancla si viene en la URL).
 // Va sin animación: con scroll-behavior: smooth, Safari dejaba la página a medio camino.
-function goToStart() {
-  const target = location.hash && document.querySelector(location.hash);
-  if (target) target.scrollIntoView({ behavior: "instant" });
-  else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-}
-
 history.scrollRestoration = "manual";
-window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-document.documentElement.style.overflow = "hidden";
-requestAnimationFrame(tickCount);
+if (!location.hash) window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-Promise.all([
-  document.fonts.load(`800 20px ${FONT_FAMILY}`).catch(() => {}),
-  new Promise((resolve) => setTimeout(resolve, LOADER_MIN)),
-]).then(() => {
+document.fonts.load(`800 20px ${FONT_FAMILY}`).catch(() => {}).finally(() => {
   layout();
+  state.start = performance.now();
+  document.body.classList.add("is-loaded");
   requestFrame();
-  requestAnimationFrame(leaveLoader);
 });

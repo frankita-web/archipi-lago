@@ -144,132 +144,6 @@ a {
   color: var(--forest);
 }
 
-/* ---------- Loader: carta náutica ---------- */
-
-.loader {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: var(--bg);
-  transition: background-color 0.8s ease;
-  /* Si el JS falla, el loader se quita solo. */
-  animation: loader-failsafe 0s linear 10s forwards;
-}
-
-.loader.is-dissolving {
-  background-color: transparent;
-}
-
-.loader__logo {
-  position: absolute;
-  overflow: visible;
-  transition: opacity 0.8s ease;
-}
-
-.loader.is-dissolving .loader__logo {
-  opacity: 0;
-}
-
-.loader__contours path {
-  vector-effect: non-scaling-stroke;
-}
-
-/* Contorno que se dibuja solo. */
-.loader__outline path {
-  fill: none;
-  stroke: var(--forest);
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  stroke-linejoin: round;
-  animation: draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.15s forwards;
-}
-
-.loader__fill path {
-  fill: var(--forest);
-  fill-opacity: 0;
-  transition: fill-opacity 0.5s ease;
-}
-
-.loader.is-filling .loader__fill path {
-  fill-opacity: 1;
-}
-
-/* Tapa la parte de las líneas de profundidad que cae dentro de las islas. */
-.loader__mask path {
-  fill: var(--bg);
-}
-
-.contour {
-  opacity: 0;
-  animation:
-    contour-in 0.9s ease calc(0.9s + var(--i) * 0.18s) forwards,
-    breathe 3.2s ease-in-out calc(1.8s + var(--i) * 0.3s) infinite;
-}
-
-.contour .ink path {
-  fill: none;
-  stroke: var(--forest);
-}
-
-.contour .erase path {
-  fill: none;
-  stroke: var(--bg);
-}
-
-.loader__contours {
-  transition: opacity 0.4s ease;
-}
-
-.loader.is-filling .loader__contours {
-  opacity: 0;
-}
-
-.loader__bar {
-  position: absolute;
-  inset: auto 0 0 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 var(--pad) 22px;
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--forest);
-  transition: opacity 0.4s ease;
-}
-
-.loader.is-filling .loader__bar {
-  opacity: 0;
-}
-
-@keyframes draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes contour-in {
-  to {
-    opacity: 0.5;
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.16;
-  }
-}
-
-@keyframes loader-failsafe {
-  to {
-    visibility: hidden;
-  }
-}
-
 /* ---------- Hero ---------- */
 
 .hero {
@@ -301,7 +175,7 @@ a {
 }
 
 .is-loaded .hero__bar {
-  animation: fade-in 1s ease 0.6s forwards;
+  animation: fade-in 1s ease 1.8s forwards;
 }
 
 .hero__bar p {
@@ -849,15 +723,7 @@ html[lang="en"] .only-es {
     opacity: 1;
   }
 
-  .loader__outline path {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
 
-  .contour {
-    animation: none;
-    opacity: 0.5;
-  }
 
   .hero__dot {
     animation: none;
