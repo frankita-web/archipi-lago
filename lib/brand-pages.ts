@@ -1,6 +1,31 @@
 // Contenido de las páginas internas de cada marca (migrado de archipielagomx.com).
-// Lo usan main.js (links del directorio) y scripts/build-brand-pages.mjs (genera /<slug>/index.html).
-export const BRAND_PAGES = {
+// Lo usan el directorio de la portada y app/[slug]/page.tsx.
+export type Bilingual = { es: string; en: string };
+
+export type BrandLocation = {
+  name: string;
+  hours: Bilingual[];
+  address: string[];
+  maps: string | null;
+};
+
+export type BrandPage = {
+  slug: string;
+  name: string;
+  group: "lugares" | "plataformas" | "spirits";
+  year: number | null;
+  // HTML con <strong> para las frases resaltadas.
+  desc: Bilingual;
+  hours: Bilingual[];
+  address: string[];
+  maps: string | null;
+  locations: BrandLocation[];
+  instagram: string | null;
+  links: { kind: "reservar" | "sitio"; href: string }[];
+  images: string[];
+};
+
+export const BRAND_PAGES: Record<string, BrandPage> = {
   "leonor": {
     "slug": "leonor",
     "name": "Leonor",

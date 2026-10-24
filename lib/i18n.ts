@@ -1,4 +1,4 @@
-// Textos en español e inglés; los usan main.js y scripts/build-brand-pages.mjs.
+// Textos en español e inglés de todo el sitio.
 export const I18N = {
   es: {
     "nav.lugares": "Lugares",
@@ -72,4 +72,7 @@ export const I18N = {
     "brand.back": "Back to the archipelago",
     months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   },
-};
+} as const;
+
+export type Lang = keyof typeof I18N;
+export type TextKey = { [K in keyof (typeof I18N)["es"]]: (typeof I18N)["es"][K] extends string ? K : never }[keyof (typeof I18N)["es"]];
