@@ -489,6 +489,7 @@ function leaveLoader() {
     loaderDone = true;
     loader.remove();
     document.documentElement.style.overflow = "";
+    goToStart();
     document.body.classList.add("is-loaded");
   }, reducedMotion ? 300 : 1500);
 }
@@ -505,8 +506,16 @@ state.bounds = logoBounds();
   positionLoaderLogo();
 }
 
+// Al cargar, la página siempre arranca en el logo (o en la sección del #ancla si viene en la URL).
+// Va sin animación: con scroll-behavior: smooth, Safari dejaba la página a medio camino.
+function goToStart() {
+  const target = location.hash && document.querySelector(location.hash);
+  if (target) target.scrollIntoView({ behavior: "instant" });
+  else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
+
 history.scrollRestoration = "manual";
-window.scrollTo(0, 0);
+window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 document.documentElement.style.overflow = "hidden";
 requestAnimationFrame(tickCount);
 

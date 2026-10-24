@@ -21,6 +21,9 @@ html {
 
 body {
   margin: 0;
+  /* Nada debe provocar scroll horizontal. */
+  overflow-x: hidden;
+  overflow-x: clip;
   background: var(--bg);
   color: var(--forest);
   font-family: var(--sans);
