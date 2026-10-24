@@ -411,35 +411,49 @@ window.addEventListener("resize", () => {
   }, 150);
 });
 
-/* ---------- Loader: el logo como islas en el mar ---------- */
+/* ---------- Loader: el logo como carta náutica ---------- */
 
 const loader = document.querySelector(".loader");
-const seaCanvas = loader.querySelector(".loader__sea");
-const sea = seaCanvas.getContext("2d");
 const loaderLogo = loader.querySelector(".loader__logo");
 const loaderCount = loader.querySelector(".loader__count");
-const SEA = "#1e3a2b";
-const LOADER_MIN = reducedMotion ? 300 : 2200;
-const DRAIN = reducedMotion ? 1 : 1200;
-const seaState = { level: 0, landAlpha: 1, start: performance.now(), done: false };
-const LAND = LOGO_PATHS.map((p) => ({ path: new Path2D(p.d), rule: p.evenodd ? "evenodd" : "nonzero" }));
+const LOADER_MIN = reducedMotion ? 300 : 2600;
+const loaderStart = performance.now();
+let loaderDone = false;
 
 {
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const group = (className, onlyIslands) => {
+  const paths = (filter, attrs = {}) =>
+    LOGO_PATHS.filter(filter).map((p) => {
+      const el = document.createElementNS(SVG_NS, "path");
+      el.setAttribute("d", p.d);
+      if (p.evenodd) el.setAttribute("fill-rule", "evenodd");
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    });
+  const group = (className, children, i) => {
     const g = document.createElementNS(SVG_NS, "g");
     g.setAttribute("class", className);
-    for (const p of LOGO_PATHS) {
-      if (onlyIslands && !p.evenodd) continue;
-      const path = document.createElementNS(SVG_NS, "path");
-      path.setAttribute("d", p.d);
-      if (p.evenodd) path.setAttribute("fill-rule", "evenodd");
-      g.append(path);
-    }
+    if (i) g.style.setProperty("--i", i);
+    g.append(...children);
     return g;
   };
-  // Dos ondas desfasadas rompen contra la orilla de las islas.
-  loaderLogo.append(group("loader__ripple", true), group("loader__ripple loader__ripple--late", true));
+  const islands = (p) => p.evenodd;
+  // Líneas de profundidad: cada una es un trazo grueso verde tapado por uno blanco un poco más angosto,
+  // así solo queda una línea fina a esa distancia de la costa. Se dibujan de la más lejana a la más cercana.
+  const contours = [4, 3, 2, 1].map((i) => group("contour", [group("ink", paths(islands)), group("erase", paths(islands))], i));
+  // El contorno se dibuja por subtrazo (cada isla y cada letra por separado) para que la línea sea continua.
+  const outline = LOGO_PATHS.flatMap((p) => p.d.split(/(?=M)/)).map((d) => {
+    const el = document.createElementNS(SVG_NS, "path");
+    el.setAttribute("d", d);
+    el.setAttribute("pathLength", "1");
+    return el;
+  });
+  loaderLogo.append(
+    group("loader__contours", contours),
+    group("loader__mask", paths(islands)),
+    group("loader__fill", paths(() => true)),
+    group("loader__outline", outline)
+  );
 }
 
 function positionLoaderLogo() {
@@ -447,105 +461,36 @@ function positionLoaderLogo() {
   if (!loader.isConnected || !r) return;
   loaderLogo.setAttribute("viewBox", `${b.x} ${b.y} ${b.w} ${b.h}`);
   Object.assign(loaderLogo.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
-}
-
-function fillLand(color) {
-  const { bounds: b, logoRect: r } = state;
-  if (!r) return;
-  const k = r.w / b.w;
-  sea.save();
-  // La tierra pertenece al hero, así que se desplaza con la página.
-  sea.translate(r.x, r.y - window.scrollY);
-  sea.scale(k, k);
-  sea.translate(-b.x, -b.y);
-  sea.fillStyle = color;
-  for (const { path, rule } of LAND) sea.fill(path, rule);
-  sea.restore();
-}
-
-function drawSea(now) {
-  if (seaState.done) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  if (seaCanvas.width !== Math.round(w * dpr) || seaCanvas.height !== Math.round(h * dpr)) {
-    seaCanvas.width = Math.round(w * dpr);
-    seaCanvas.height = Math.round(h * dpr);
+  // Línea de contorno de ~1.25px en pantalla, expresada en unidades del viewBox.
+  loaderLogo.querySelector(".loader__outline").style.strokeWidth = `${(1.25 * b.w) / r.w}`;
+  const unit = Math.max(5, r.w / 95);
+  for (const contour of loaderLogo.querySelectorAll(".contour")) {
+    const d = unit * Number(contour.style.getPropertyValue("--i"));
+    contour.querySelector(".ink").style.strokeWidth = `${2 * d + 1}px`;
+    contour.querySelector(".erase").style.strokeWidth = `${2 * d - 1}px`;
   }
-  const t = reducedMotion ? 0 : now - seaState.start;
-  sea.setTransform(dpr, 0, 0, dpr, 0, 0);
-  sea.clearRect(0, 0, w, h);
-
-  // Superficie del agua: arriba de la pantalla al inicio, baja hasta vaciarse al salir.
-  const surface = seaState.level * (h + 80) - 40;
-  sea.beginPath();
-  sea.moveTo(0, h);
-  for (let x = 0; x <= w + 24; x += 24) {
-    sea.lineTo(x, surface + Math.sin(x * 0.007 + t * 0.003) * 16 + Math.sin(x * 0.019 - t * 0.002) * 6);
-  }
-  sea.lineTo(w, h);
-  sea.closePath();
-  sea.fillStyle = SEA;
-  sea.fill();
-
-  // Fuera del agua la tierra es verde sobre blanco; dentro del agua, blanca sobre el mar.
-  sea.globalAlpha = seaState.landAlpha;
-  fillLand(SEA);
-  sea.globalAlpha = 1;
-
-  sea.save();
-  sea.clip();
-  sea.strokeStyle = "rgba(255, 255, 255, 0.09)";
-  sea.lineWidth = 1;
-  for (let y0 = 6; y0 < h + 16; y0 += 15) {
-    sea.beginPath();
-    for (let x = 0; x <= w + 12; x += 12) {
-      const y = y0 + Math.sin(x * 0.011 + t * 0.0016 + y0 * 0.07) * 3.5 + Math.sin(x * 0.027 - t * 0.0023 + y0) * 1.2;
-      if (x === 0) sea.moveTo(x, y);
-      else sea.lineTo(x, y);
-    }
-    sea.stroke();
-  }
-  sea.globalAlpha = seaState.landAlpha;
-  fillLand("#fff");
-  sea.restore();
-  requestAnimationFrame(drawSea);
 }
 
 function tickCount(now) {
-  const p = Math.min(1, (now - seaState.start) / LOADER_MIN);
+  const p = Math.min(1, (now - loaderStart) / LOADER_MIN);
   loaderCount.textContent = `[ ${String(Math.round((1 - (1 - p) ** 2) * 100)).padStart(3, "0")} ]`;
-  if (p < 1 && !seaState.done) requestAnimationFrame(tickCount);
+  if (p < 1 && !loaderDone) requestAnimationFrame(tickCount);
 }
 
+// El contorno se rellena, las líneas de profundidad se van y el logo se deshace en letras.
 function leaveLoader() {
-  loader.classList.add("is-leaving");
-  const t0 = performance.now();
-  const drain = (now) => {
-    const p = Math.min(1, (now - t0) / DRAIN);
-    seaState.level = p < 0.5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2;
-    if (p < 1) requestAnimationFrame(drain);
-  };
-  requestAnimationFrame(drain);
-
-  // Cuando el agua ya bajó de las islas, se desmoronan en letras.
+  loader.classList.add("is-filling");
   setTimeout(() => {
+    loader.classList.add("is-dissolving");
     state.start = performance.now();
     requestFrame();
-    const f0 = performance.now();
-    const fade = (now) => {
-      seaState.landAlpha = Math.max(0, 1 - (now - f0) / 700);
-      if (seaState.landAlpha > 0) requestAnimationFrame(fade);
-    };
-    requestAnimationFrame(fade);
-  }, DRAIN * 0.8);
-
+  }, reducedMotion ? 0 : 600);
   setTimeout(() => {
-    seaState.done = true;
+    loaderDone = true;
     loader.remove();
     document.documentElement.style.overflow = "";
     document.body.classList.add("is-loaded");
-  }, DRAIN + 900);
+  }, reducedMotion ? 300 : 1500);
 }
 
 state.bounds = logoBounds();
@@ -563,7 +508,6 @@ state.bounds = logoBounds();
 history.scrollRestoration = "manual";
 window.scrollTo(0, 0);
 document.documentElement.style.overflow = "hidden";
-requestAnimationFrame(drawSea);
 requestAnimationFrame(tickCount);
 
 Promise.all([
