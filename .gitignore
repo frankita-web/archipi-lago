@@ -5,3 +5,7 @@ next-env.d.ts
 *.tsbuildinfo
 .vercel/
 .DS_Store
+
+# claves (no subir)
+.env*
+!.env.example

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": ["C:/Users/fran-/orca/archipi-lago/node_modules/next/dist/bin/next", "dev", "C:/Users/fran-/orca/archipi-lago", "-p", "3000"],
+      "port": 3000
+    }
+  ]
+}
